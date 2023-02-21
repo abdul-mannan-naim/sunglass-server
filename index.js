@@ -28,7 +28,7 @@ async function run() {
     })
     app.get('/items', async (req, res) => {
       const query = {}
-      const result = await availableCollection.find(query)
+      const result = await availableCollection.find(query).toArray()
       res.send(result)
     })
 
