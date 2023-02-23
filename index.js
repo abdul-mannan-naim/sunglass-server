@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 const cors = require('cors');
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
 
 
@@ -18,8 +18,42 @@ async function run() {
 
   try {
     const availableCollection = client.db("sunglass").collection("available");
+    const cardCollection = client.db("sunglass").collection("card");
 
 
+
+    app.post('/card', async (req, res) => {
+      const query = req.body;
+      const result = await cardCollection.insertOne(query)
+      res.send(result)
+    })
+    app.get('/card', async (req, res) => {
+      const query = {}
+      const result = await cardCollection.find(query).limit(4).toArray()
+      res.send(result)
+    })
+    app.delete('/delete', async (req, res) => {
+      const query = {}
+      const result = await cardCollection.deleteMany(query)
+      res.send(result)
+    })
+    app.delete('/delete/:id', async (req, res) => {
+      const id = new ObjectId(req.params.id);
+      const query = { _id: id };
+      const result = await cardCollection.deleteOne(query)
+      res.send(result)
+    })
+
+    app.post('/randomCard', async (req, res) => {
+      const query = req.body;
+      const skip = await cardCollection.deleteMany({})
+      if (skip) {
+        const result = await cardCollection.insertOne(query)
+        res.send( result  )
+      } 
+    })
+
+    // -----------------------------------
 
     app.post('/addItem', async (req, res) => {
       const query = req.body;
